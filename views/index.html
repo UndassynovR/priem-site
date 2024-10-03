@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <title>Приемная комиссия колледжа</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+		<div class="header">
+			<img src="/logo.png" width="100" height="100" alt="">
+			<p class="ubuntu-medium">КОЛЛЕДЖ АО "КАЗАХСКИЙ УНИВЕРСИТЕТ ТЕХНОЛОГИИ И БИЗНЕСА имени К.Кулажанова"</p>
+		</div>
+        <form class="admission-form" id="admissionForm" action="/submit" method="POST">
+            <label for="first-name">Имя:</label>
+            <input type="text" id="first-name" name="first-name" placeholder="Ваше имя" required>
+
+            <label for="last-name">Фамилия:</label>
+            <input type="text" id="last-name" name="last-name" placeholder="Ваша фамилия" required>
+
+            <label for="school">Школа:</label>
+            <input type="text" id="school" name="school" placeholder="Номер/Название школы" required>
+
+            <label for="phone">Номер телефона:</label>
+            <input type="tel" id="phone" name="phone" value="+7" required>
+
+            <h2>Информация о родителях</h2>
+
+            <label for="mother-name">Имя матери:</label>
+            <input type="text" id="mother-name" name="mother-name" placeholder="Имя матери">
+
+            <label for="mother-phone">Номер телефона матери:</label>
+            <input type="tel" id="mother-phone" name="mother-phone" value="+7" placeholder="Номер телефона матери">
+
+            <label for="father-name">Имя отца:</label>
+            <input type="text" id="father-name" name="father-name" placeholder="Имя отца">
+
+            <label for="father-phone">Номер телефона отца:</label>
+            <input type="tel" id="father-phone" name="father-phone" value="+7" placeholder="Номер телефона отца">
+
+            <p id="parent-error" style="color: red; display: none;">Необходимо заполнить информацию хотя бы об одном из родителей!</p>
+            <p id="phone-error" style="color: red; display: none;">Пожалуйста, введите корректные номера телефонов.</p>
+
+            <button type="submit">Отправить заявку</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('admissionForm').addEventListener('submit', function(event) {
+            const motherName = document.getElementById('mother-name').value.trim();
+            const motherPhone = document.getElementById('mother-phone').value.trim();
+            const fatherName = document.getElementById('father-name').value.trim();
+            const fatherPhone = document.getElementById('father-phone').value.trim();
+            const applicantPhone = document.getElementById('phone').value.trim();
+            const errorMsgParent = document.getElementById('parent-error');
+            const errorMsgPhone = document.getElementById('phone-error');
+            
+            errorMsgParent.style.display = 'none';
+            errorMsgPhone.style.display = 'none';
+
+            // Проверяем, заполнена ли информация хотя бы об одном из родителей
+            if ((motherName === '' || motherPhone === '+7') && (fatherName === '' || fatherPhone === '+7')) {
+                errorMsgParent.style.display = 'block';
+                event.preventDefault(); // Останавливаем отправку формы
+            }
+
+            // Функция для проверки и форматирования телефонного номера
+            function formatPhone(phone) {
+                // Удаляем все символы, кроме цифр
+                let cleaned = phone.replace(/\D/g, '');
+                
+                // Если пользователь ввел 8 в начале номера, заменяем ее на +7
+                if (cleaned.startsWith('8')) {
+                    cleaned = '7' + cleaned.slice(1);
+                }
+
+                // Добавляем +7 в начале, если его нет
+                if (!cleaned.startsWith('7')) {
+                    cleaned = '7' + cleaned;
+                }
+
+                // Проверяем, чтобы после +7 было ровно 10 цифр
+                if (cleaned.length === 11) {
+                    return '+7' + cleaned.slice(1); // Преобразуем в формат +7 и возвращаем
+                }
+
+                return ''; // Возвращаем пустую строку, если номер некорректен
+            }
+
+            // Валидация и форматирование номера телефона заявителя
+            const formattedApplicantPhone = formatPhone(applicantPhone);
+            document.getElementById('phone').value = formattedApplicantPhone;
+
+            // Валидация и форматирование номеров родителей
+            const formattedMotherPhone = motherPhone ? formatPhone(motherPhone) : '';
+            const formattedFatherPhone = fatherPhone ? formatPhone(fatherPhone) : '';
+            if (motherPhone) {
+                document.getElementById('mother-phone').value = formattedMotherPhone;
+            }
+            if (fatherPhone) {
+                document.getElementById('father-phone').value = formattedFatherPhone;
+            }
+
+            // Проверка, корректны ли номера телефонов
+            if (
+                (applicantPhone && formattedApplicantPhone === '') ||
+                (motherPhone && formattedMotherPhone === '') ||
+                (fatherPhone && formattedFatherPhone === '')
+            ) {
+                errorMsgPhone.style.display = 'block';
+                event.preventDefault(); // Останавливаем отправку формы, если номера некорректны
+            }
+        });
+    </script>
+</body>
+</html>

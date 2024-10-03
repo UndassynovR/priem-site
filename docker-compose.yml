@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://priem:supersecret@db:5432/priem
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: priem
+      POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: priem
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
+

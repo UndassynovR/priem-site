@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px; /* Increase max width of the container */
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse; /* Ensures borders collapse into a single border */
+    margin-top: 20px;
+    table-layout: auto; /* Allows the table to automatically adjust column widths */
+}
+
+table, th, td {
+    border: 1px solid #ddd; /* Sets border for the table and its cells */
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Additional styles for responsive handling */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px; /* Adjust padding for smaller screens */
+    }
+
+    th, td {
+        padding: 8px; /* Adjust padding for smaller screens */
+    }
+}
+
