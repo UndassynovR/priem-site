@@ -1,0 +1,24 @@
+# Use the official Node.js image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install --production
+
+# Copy the rest of your application code
+COPY . .
+
+# Copy production certificates into the container
+COPY /etc/letsencrypt/live/priem.qutb.edu.kz/fullchain.pem /etc/ssl/certs/server.cert
+COPY /etc/letsencrypt/live/priem.qutb.edu.kz/privkey.pem /etc/ssl/private/server.key
+
+# Expose the HTTPS port
+EXPOSE 443
+
+# Start the Node.js application
+CMD ["node", "app.js"]

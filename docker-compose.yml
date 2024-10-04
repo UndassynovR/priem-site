@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     ports:
-      - "80:80"
+      - "443:443"
     depends_on:
       - db
     environment:
@@ -23,4 +23,3 @@ services:
 
 volumes:
   postgres_data:
-

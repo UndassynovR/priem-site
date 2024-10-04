@@ -1,4 +1,6 @@
+const https = require('https');
 const express = require('express');
+const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
@@ -7,7 +9,13 @@ const XLSX = require('xlsx');
 
 // Create Express app
 const app = express();
-const PORT = process.env.PORT || 80; // Use port 80
+const PORT = process.env.PORT || 443; // Use port 443
+
+// Path to SSL certificates inside the container
+const sslOptions = {
+  key: fs.readFileSync('/etc/ssl/private/server.key'),
+  cert: fs.readFileSync('/etc/ssl/certs/server.cert'),
+};
 
 // PostgreSQL connection
 const pool = new Pool({
@@ -19,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Body parser middleware to handle form data
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 // Serve the form page
 app.get('/', (req, res) => {
@@ -33,8 +42,8 @@ app.post('/submit', async (req, res) => {
     try {
         // Save data to PostgreSQL
         const query = `
-            INSERT INTO students (first_name, last_name, school, phone, mother_name, mother_phone, father_name, father_phone, created_at)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            INSERT INTO students (first_name, last_name, school, phone, mother_name, mother_phone, father_name, father_phone)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `;
         const values = [
             formData['first-name'],
@@ -45,11 +54,11 @@ app.post('/submit', async (req, res) => {
             formData['mother-phone'],
             formData['father-name'],
             formData['father-phone'],
-            new Date(), // Current timestamp
         ];
 
         await pool.query(query, values);
-        res.send('Заявка успешно отправлена и сохранена в базе данных! Спасибо.');
+        // Send success message back to the client
+        res.json({ message: 'Заявка успешно отправлена и сохранена в базе данных! Спасибо.' });
     } catch (err) {
         console.error('Error saving submission:', err);
         res.status(500).send('Ошибка при отправке заявки. Пожалуйста, попробуйте снова позже.');
@@ -106,8 +115,7 @@ app.get('/export', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Start the HTTPS server
+https.createServer(sslOptions, app).listen(PORT, () => {
+    console.log(`Server running securely on port ${PORT}`);
 });
-

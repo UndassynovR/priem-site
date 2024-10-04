@@ -10,7 +10,8 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 10px; /* Add padding for smaller screens */
 }
 
 .container {
@@ -20,6 +21,7 @@ body {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     max-width: 500px;
     width: 100%;
+    margin-top: 20px; /* Add margin to avoid sticking to the top */
 }
 
 h1 {
@@ -64,13 +66,38 @@ button:hover {
 }
 
 .ubuntu-medium {
-  font-family: "Ubuntu", sans-serif;
-  font-weight: 500;
-  font-style: normal;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 500;
+    font-style: normal;
 }
 
 .header {
     display: flex;
     align-items: center;
     gap: 20px;
+}
+
+.header img {
+    max-width: 100px;
+    height: auto; /* Ensure the image scales down properly */
+}
+
+.header p {
+    font-size: 16px;
+    line-height: 1.4;
+    word-wrap: break-word; /* Ensure text wraps on smaller screens */
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px; /* Adjust padding for smaller screens */
+    }
+
+    .header p {
+        font-size: 14px; /* Reduce text size on smaller screens */
+    }
+
+    .header img {
+        max-width: 80px; /* Scale down logo on smaller screens */
+    }
 }

@@ -1,0 +1,35 @@
+# Use the official Node.js image
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of your application code
+COPY . .
+
+# Define build argument to determine environment
+ARG ENV=development
+
+# Generate self-signed certificates for development
+RUN if [ "$ENV" = "development" ]; then \
+      apk add --no-cache openssl && \
+      openssl req -nodes -new -x509 -keyout /etc/ssl/private/server.key -out /etc/ssl/certs/server.cert -days 365 -subj "/C=US/ST=California/L=San Francisco/O=MyOrg/OU=MyUnit/CN=localhost"; \
+    else \
+      echo "Skipping certificate generation for production." ; \
+    fi
+
+# Copy production certificates into the container if not in development
+COPY path/to/your/server.cert /etc/ssl/certs/server.cert || echo "No production certificates provided."
+COPY path/to/your/server.key /etc/ssl/private/server.key || echo "No production key provided."
+
+# Expose the HTTPS port
+EXPOSE 443
+
+# Start the Node.js application
+CMD ["node", "app.js"]

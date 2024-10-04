@@ -15,7 +15,7 @@
 			<img src="/logo.png" width="100" height="100" alt="">
 			<p class="ubuntu-medium">КОЛЛЕДЖ АО "КАЗАХСКИЙ УНИВЕРСИТЕТ ТЕХНОЛОГИИ И БИЗНЕСА имени К.Кулажанова"</p>
 		</div>
-        <form class="admission-form" id="admissionForm" action="/submit" method="POST">
+        <form class="admission-form" id="admissionForm">
             <label for="first-name">Имя:</label>
             <input type="text" id="first-name" name="first-name" placeholder="Ваше имя" required>
 
@@ -49,72 +49,90 @@
         </form>
     </div>
 
-    <script>
-        document.getElementById('admissionForm').addEventListener('submit', function(event) {
-            const motherName = document.getElementById('mother-name').value.trim();
-            const motherPhone = document.getElementById('mother-phone').value.trim();
-            const fatherName = document.getElementById('father-name').value.trim();
-            const fatherPhone = document.getElementById('father-phone').value.trim();
-            const applicantPhone = document.getElementById('phone').value.trim();
-            const errorMsgParent = document.getElementById('parent-error');
-            const errorMsgPhone = document.getElementById('phone-error');
-            
-            errorMsgParent.style.display = 'none';
-            errorMsgPhone.style.display = 'none';
+<script>
+    document.getElementById('admissionForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent form submission
 
-            // Проверяем, заполнена ли информация хотя бы об одном из родителей
-            if ((motherName === '' || motherPhone === '+7') && (fatherName === '' || fatherPhone === '+7')) {
-                errorMsgParent.style.display = 'block';
-                event.preventDefault(); // Останавливаем отправку формы
+        const motherName = document.getElementById('mother-name').value.trim();
+        const motherPhone = document.getElementById('mother-phone').value.trim();
+        const fatherName = document.getElementById('father-name').value.trim();
+        const fatherPhone = document.getElementById('father-phone').value.trim();
+        const applicantPhone = document.getElementById('phone').value.trim();
+        const errorMsgParent = document.getElementById('parent-error');
+        const errorMsgPhone = document.getElementById('phone-error');
+
+        errorMsgParent.style.display = 'none';
+        errorMsgPhone.style.display = 'none';
+
+        // Проверяем, заполнена ли информация хотя бы об одном из родителей
+        if ((motherName === '' || motherPhone === '+7') && (fatherName === '' || fatherPhone === '+7')) {
+            errorMsgParent.style.display = 'block';
+            return; // Останавливаем выполнение функции
+        }
+
+        // Функция для проверки и форматирования телефонного номера
+        function formatPhone(phone) {
+            let cleaned = phone.replace(/\D/g, '');
+            if (cleaned.startsWith('8')) {
+                cleaned = '7' + cleaned.slice(1);
+            }
+            if (!cleaned.startsWith('7')) {
+                cleaned = '7' + cleaned;
+            }
+            if (cleaned.length === 11) {
+                return '+7' + cleaned.slice(1);
+            }
+            return ''; // Возвращаем пустую строку, если номер некорректен
+        }
+
+        // Валидация и форматирование номера телефона заявителя
+        const formattedApplicantPhone = formatPhone(applicantPhone);
+        document.getElementById('phone').value = formattedApplicantPhone;
+
+        // Валидация и форматирование номеров родителей
+        const formattedMotherPhone = motherPhone ? formatPhone(motherPhone) : '';
+        const formattedFatherPhone = fatherPhone ? formatPhone(fatherPhone) : '';
+        if (motherPhone) {
+            document.getElementById('mother-phone').value = formattedMotherPhone;
+        }
+        if (fatherPhone) {
+            document.getElementById('father-phone').value = formattedFatherPhone;
+        }
+
+        // Проверка, корректны ли номера телефонов
+        if (
+            (applicantPhone && formattedApplicantPhone === '') ||
+            (motherPhone && formattedMotherPhone === '') ||
+            (fatherPhone && formattedFatherPhone === '')
+        ) {
+            errorMsgPhone.style.display = 'block';
+            return; // Останавливаем выполнение функции
+        }
+
+        // Collect form data
+        const formData = new FormData(this);
+
+        try {
+            // Submit form data to the server
+            const response = await fetch('/submit', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
             }
 
-            // Функция для проверки и форматирования телефонного номера
-            function formatPhone(phone) {
-                // Удаляем все символы, кроме цифр
-                let cleaned = phone.replace(/\D/g, '');
-                
-                // Если пользователь ввел 8 в начале номера, заменяем ее на +7
-                if (cleaned.startsWith('8')) {
-                    cleaned = '7' + cleaned.slice(1);
-                }
-
-                // Добавляем +7 в начале, если его нет
-                if (!cleaned.startsWith('7')) {
-                    cleaned = '7' + cleaned;
-                }
-
-                // Проверяем, чтобы после +7 было ровно 10 цифр
-                if (cleaned.length === 11) {
-                    return '+7' + cleaned.slice(1); // Преобразуем в формат +7 и возвращаем
-                }
-
-                return ''; // Возвращаем пустую строку, если номер некорректен
-            }
-
-            // Валидация и форматирование номера телефона заявителя
-            const formattedApplicantPhone = formatPhone(applicantPhone);
-            document.getElementById('phone').value = formattedApplicantPhone;
-
-            // Валидация и форматирование номеров родителей
-            const formattedMotherPhone = motherPhone ? formatPhone(motherPhone) : '';
-            const formattedFatherPhone = fatherPhone ? formatPhone(fatherPhone) : '';
-            if (motherPhone) {
-                document.getElementById('mother-phone').value = formattedMotherPhone;
-            }
-            if (fatherPhone) {
-                document.getElementById('father-phone').value = formattedFatherPhone;
-            }
-
-            // Проверка, корректны ли номера телефонов
-            if (
-                (applicantPhone && formattedApplicantPhone === '') ||
-                (motherPhone && formattedMotherPhone === '') ||
-                (fatherPhone && formattedFatherPhone === '')
-            ) {
-                errorMsgPhone.style.display = 'block';
-                event.preventDefault(); // Останавливаем отправку формы, если номера некорректны
-            }
-        });
-    </script>
+            const result = await response.json();
+            // Show success message
+            document.getElementById('message').innerText = result.message;
+            // Optionally reset the form
+            this.reset();
+        } catch (error) {
+            console.error('Error during form submission:', error);
+            document.getElementById('message').innerText = 'Ошибка при отправке заявки. Пожалуйста, попробуйте снова позже.';
+        }
+    });
+</script>
 </body>
 </html>
