@@ -42,8 +42,8 @@ app.post('/submit', async (req, res) => {
     try {
         // Save data to PostgreSQL
         const query = `
-            INSERT INTO students (first_name, last_name, school, phone, mother_name, mother_phone, father_name, father_phone)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            INSERT INTO students (first_name, last_name, school, phone, mother_name, mother_phone, father_name, father_phone, created_at)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         `;
         const values = [
             formData['first-name'],
@@ -54,11 +54,11 @@ app.post('/submit', async (req, res) => {
             formData['mother-phone'],
             formData['father-name'],
             formData['father-phone'],
+            new Date(), // Current timestamp
         ];
 
         await pool.query(query, values);
-        // Send success message back to the client
-        res.json({ message: 'Заявка успешно отправлена и сохранена в базе данных! Спасибо.' });
+        res.send('Заявка успешно отправлена и сохранена в базе данных! Спасибо.');
     } catch (err) {
         console.error('Error saving submission:', err);
         res.status(500).send('Ошибка при отправке заявки. Пожалуйста, попробуйте снова позже.');
