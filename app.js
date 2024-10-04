@@ -58,10 +58,10 @@ app.post('/submit', async (req, res) => {
         ];
 
         await pool.query(query, values);
-        res.send('Заявка успешно отправлена и сохранена в базе данных! Спасибо.');
+        res.json({ message: 'Заявка успешно отправлена и сохранена в базе данных! Спасибо.' });
     } catch (err) {
         console.error('Error saving submission:', err);
-        res.status(500).send('Ошибка при отправке заявки. Пожалуйста, попробуйте снова позже.');
+        res.status(500).json({ error: 'Ошибка при отправке заявки. Пожалуйста, попробуйте снова позже.' });
     }
 });
 
