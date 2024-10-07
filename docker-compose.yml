@@ -5,6 +5,7 @@ services:
       dockerfile: Dockerfile.prod
     ports:
       - "443:443"
+    restart: always
     depends_on:
       - db
     environment:
