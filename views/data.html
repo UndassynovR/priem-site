@@ -7,35 +7,65 @@
     <link rel="stylesheet" href="data_styles.css">
 </head>
 <body>
+
     <div class="container">
         <h1>Данные студентов</h1>
         <table id="students-table">
-            <thead>
-                <tr>
-                    <th>Имя</th>
-                    <th>Фамилия</th>
-                    <th>Школа</th>
-                    <th>Номер телефона</th>
-                    <th>Имя матери</th>
-                    <th>Номер телефона матери</th>
-                    <th>Имя отца</th>
-                    <th>Номер телефона отца</th>
-                    <th>Дата создания</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated here by JavaScript -->
-            </tbody>
+			<thead>
+				<tr>
+					<th>Имя</th>
+					<th>Фамилия</th>
+					<th>Школа</th>
+					<th>Номер телефона</th>
+					<th>Имя матери</th>
+					<th>Номер телефона матери</th>
+					<th>Имя отца</th>
+					<th>Номер телефона отца</th>
+					<th>Дата создания</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Data will be populated here by JavaScript -->
+			</tbody>
         </table>
     </div>
-	<button id="export-button">Экспортировать в XLSX</button>
 
-	<script>
-		document.getElementById('export-button').addEventListener('click', () => {
-			window.location.href = '/export';
+    <button id="export-button">Экспортировать в XLSX</button>
+    <button id="clear-button">Очистить таблицу</button>
+
+    <script>
+        document.getElementById('export-button').addEventListener('click', () => {
+            window.location.href = '/export'; // Измените путь на правильный для вашего приложения
+        });
+
+		document.getElementById('clear-button').addEventListener('click', () => {
+			const confirmation = confirm("Вы действительно хотите очистить таблицу?");
+			if (confirmation) {
+				clearTable();
+				clearDatabase();
+			}
 		});
-	</script>
+
+		function clearTable() {
+			const tbody = document.getElementById('students-table').getElementsByTagName('tbody')[0];
+			tbody.innerHTML = ''; // Очищаем содержимое таблицы
+		}
+
+		async function clearDatabase() {
+			try {
+				const response = await fetch('/clear', { method: 'DELETE' });
+				if (response.ok) {
+					alert('Данные успешно очищены из базы данных');
+				} else {
+					alert('Ошибка при очистке данных из базы данных');
+				}
+			} catch (error) {
+				console.error('Error clearing data:', error);
+				alert('Ошибка при очистке данных из базы данных');
+			}
+		}
+    </script>
     <script src="data.js"></script>
+
 </body>
 </html>
-

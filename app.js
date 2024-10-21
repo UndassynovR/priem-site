@@ -115,6 +115,19 @@ app.get('/export', async (req, res) => {
     }
 });
 
+// Route to clear student data from the database
+app.delete('/clear', async (req, res) => {
+    try {
+        // Execute the delete query
+        await pool.query('DELETE FROM students');
+        // Send a success response
+        res.status(200).json({ message: 'Данные успешно очищены' });
+    } catch (error) {
+        console.error('Error clearing data:', error);
+        res.status(500).json({ error: 'Ошибка при очистке данных' });
+    }
+});
+
 // Start the HTTPS server
 https.createServer(sslOptions, app).listen(PORT, () => {
     console.log(`Server running securely on port ${PORT}`);
