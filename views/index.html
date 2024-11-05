@@ -121,6 +121,9 @@
             if (response.ok) {
                 notification.innerText = result.message;
                 notification.style.display = 'block';
+				setTimeout(function() {
+					window.location.href = 'https://qutb.edu.kz';
+				}, 3000);
                 this.reset(); // Clear the form
             } else {
                 notification.innerText = result.error || 'Произошла ошибка. Пожалуйста, попробуйте снова.';
